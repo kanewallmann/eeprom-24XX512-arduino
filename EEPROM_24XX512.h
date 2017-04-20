@@ -9,7 +9,7 @@
 #include <Wire.h>
 
 #define EEPROM_24XX512_WRITE_BUFFER_SIZE   	 (128)        // Internal write buffer size per data sheet
-#define EEPROM_24XX512_MAX_ADDR              (512)        // Max memory size per data sheet
+#define EEPROM_24XX512_MAX_ADDR              (64000)      // Max memory size per data sheet
 
 typedef enum
 {
