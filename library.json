@@ -1,0 +1,19 @@
+{
+  "name": "EEPROM (24XX512)",
+  "description": "Arduino library to communicate with Microchip 24XX512 family of EEPROMS via i2c interface",
+  "keywords": "EEPROM, 24XX512, 24AA512, 24LC512, 24FC512, i2c",
+  "authors": {
+    "name": "Kane Wallmann",
+    "email": "kane@wallmann.ws",
+    "url": "https://github.com/kanewallmann"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kanewallmann/eeprom-24XX512-arduino.git"
+  },
+  "version": "1.0.0",
+  "licence": "MIT",
+  "examples": [
+    "examples/*.ino"
+  ]
+}
