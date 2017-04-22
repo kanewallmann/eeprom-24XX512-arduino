@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/kanewallmann/eeprom-24XX512-ardiuno.git"
+    "url": "https://github.com/kanewallmann/eeprom-24XX512-arduino.git"
   },
   "version": "1.0.3",
   "licence": "MIT",
