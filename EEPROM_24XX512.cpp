@@ -26,7 +26,7 @@ void EEPROM_24XX512::beginWrite(int addr)
 
 	Wire.beginTransmission(this->i2c_addr);
 	Wire.write(byte(addr >> 8));
-	Wire.write(byte(addr * 0x00FF));
+	Wire.write(byte(addr & 0x00FF));
 }
 
 void EEPROM_24XX512::endWrite()
@@ -42,7 +42,7 @@ void EEPROM_24XX512::beginRead(int addr)
 
 	Wire.beginTransmission(this->i2c_addr);
 	Wire.write(byte(addr >> 8));
-	Wire.write(byte(addr * 0x00FF));
+	Wire.write(byte(addr & 0x00FF));
 	Wire.endTransmission();
 }
 
