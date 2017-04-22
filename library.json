@@ -11,7 +11,7 @@
     "type": "git",
     "url": "https://github.com/kanewallmann/eeprom-24XX512-ardiuno.git"
   },
-  "version": "1.0.1",
+  "version": "1.0.2",
   "licence": "MIT",
   "examples": [
     "examples/*.ino"
