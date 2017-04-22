@@ -8,8 +8,8 @@
 #include <Arduino.h>
 #include <Wire.h>
 
-#define EEPROM_24XX512_WRITE_BUFFER_SIZE   	 (128)        // Internal write buffer size per data sheet
-#define EEPROM_24XX512_MAX_ADDR              (64000)      // Max memory size per data sheet
+#define EEPROM_24XX512_WRITE_BUFFER_SIZE     (128)        // Internal write buffer size per data sheet
+#define EEPROM_24XX512_MAX_ADDR              (64000u)      // Max memory size per data sheet
 
 typedef enum
 {
@@ -86,7 +86,7 @@ public:
 	 *
 	 * @param addr 			The address of the first byte written
 	 */
-	void beginWrite(int addr);
+	void beginWrite(unsigned int address);
 
 	/**
 	 * End a sequential write session
@@ -100,7 +100,7 @@ public:
 	 *
 	 * @param addr 			The address of the first byte to read
 	 */
-	void beginRead(int addr);
+	void beginRead(unsigned int address);
 
 	/**
 	 * Ends a sequential read session
@@ -126,7 +126,7 @@ public:
 	 * @return 			Returns number of elements actually read, may be less than requested due to size restraint
 	 */
 	template<typename T>
-	int readArray(int address, T *data, size_t count);
+	unsigned int readArray(unsigned int address, T* data, unsigned int count);
 
 	/**
 	 * Read some data, must be called between beginRead() and endRead()
@@ -137,7 +137,7 @@ public:
 	 * @return 			Returns number of elements actually read, may be less than requested due to size restraint
 	 */
 	template<typename T>
-	int readArray(T *data, size_t count);
+	unsigned int readArray(T* data, unsigned int count);
 
 	/**
 	 * Writes some data, not to be called between beginWrite() and endWrite()
@@ -149,7 +149,7 @@ public:
 	 * @return 			Returns the number of elements actually written, may be less than requested due to size restraint
 	 */
 	template<typename T>
-	int writeArray(int address, const T *data, size_t count);
+	unsigned int writeArray(unsigned int address, const T* data, unsigned int count);
 
 	/**
 	 * Writes some data, must be called between beginWrite() and endWrite()
@@ -160,7 +160,7 @@ public:
 	 * @return 			Returns the number of elements actually written, may be less than requested due to size restraint
 	 */
 	template<typename T>
-	int writeArray(const T *data, size_t count);
+	unsigned int writeArray(const T* data, unsigned int count);
 
 	/**
 	 * Reads a single T from current address pointer, not to be called between beginRead() and endRead()
@@ -171,7 +171,7 @@ public:
 	 * @return			true on successful read, false if there wasn't enough memory to read the full type
 	 */
 	template<typename T>
-	bool read(int address, T *data);
+	bool read(unsigned int address, T* data);
 
 	/**
 	 * Reads a single T from current address pointer, must be called between beginRead() and endRead()
@@ -181,7 +181,7 @@ public:
 	 * @return			true on successful read, false if there wasn't enough memory to read the full type
 	 */
 	template<typename T>
-	bool read(T *data);
+	bool read(T* data);
 
 	/**
 	 * Writes a single T to the current address point, must be called between beginWrite() and endWrite()
@@ -192,7 +192,7 @@ public:
 	 * @return			true on successful write, false if there wasn't enough space to write
 	 */
 	template<typename T>
-	bool write(int addr, const T data);
+	bool write(unsigned int address, const T data);
 
 	/**
 	 * Writes a single T to the current address point, must be called between beginWrite() and endWrite()
@@ -204,18 +204,66 @@ public:
 	template<typename T>
 	bool write(const T data);
 
+	/**
+	 * Writes bytes to the supplied address, not to be called between beginWrite() and endWrite()
+	 *
+	 * @param address 	The address to write to
+	 * @param data 		Pointer to count * bytes to write
+	 * @param count 	Number of bytes to write
+	 * @return 			Number of bytes actually written, might be different from requested due to size restraints
+	 */
+	unsigned int writeBytes(unsigned int address, const byte* data, unsigned int count);
+
+	/**
+	 * Writes bytes to the current address pointer, must be called between beginWrite() and endWrite()
+	 *
+	 * @param data 		Pointer to count * bytes to write
+	 * @param count 	Number of bytes to write
+	 * @return 			Number of bytes actually written, might be different from requested due to size restraints
+	 */
+	unsigned int writeBytes(const byte* data, unsigned int count);
+
+	/**
+	 * Reads byte from the supplied address, not to be called between beginRead() and endRead()
+	 *
+	 * @param address 	Address to read from
+	 * @param data 		Pointer to count * bytes to read the data into
+	 * @param count 	Number of bytes to read
+	 * @return 			Number of bytes actually read, might be different from requested due to size restraints
+	 */
+	unsigned int readBytes(unsigned int address, byte* data, unsigned int count);
+
+	/**
+	 * Reads byte from the current address pointer, must be called between beginRead() and endRead()
+	 *
+	 * @param data 		Pointer to count * bytes to read the data into
+	 * @param count 	Number of bytes to read
+	 * @return 			Number of bytes actually read, might be different from requested due to size restraints
+	 */
+	unsigned int readBytes(byte* data, unsigned int count);
+
+	/**
+	 * Attempts to perform a write and checks if device returns an ACK. This test process determines if the device is
+	 * ready to receive new read/write commands following a write
+	 *
+	 * This method should not be called between beginWrite()/endWrite() or beginRead()/endRead()
+	 *
+	 * @return		True if the device is ready
+	 */
+	bool isReady();
+
 private:
 	int i2c_addr;
-	int write_count;
-	int write_addr;
-	int read_addr;
+	unsigned int write_count;
+	unsigned int write_addr;
+	unsigned int read_addr;
 	bool wp;
 	int pin_wp;
 	EepromState state;
 };
 
 template<typename T>
-int EEPROM_24XX512::readArray(int address, T *d, size_t count)
+unsigned int EEPROM_24XX512::readArray(unsigned int address, T* d, unsigned int count)
 {
 	if( this->state != STATE_RANDOM )
 	{
@@ -223,57 +271,28 @@ int EEPROM_24XX512::readArray(int address, T *d, size_t count)
 	}
 
 	this->beginRead(address);
-	int result = this->readArray(d, count);
+	unsigned int result = this->readArray(d, count);
 	this->endRead();
 	return result;
 }
 
 template<typename T>
-int EEPROM_24XX512::readArray(T *d, size_t count)
+unsigned int EEPROM_24XX512::readArray(T* d, unsigned int count)
 {
 	if( this->state != STATE_READ )
 	{
 		return 0;
 	}
 
-	size_t a = 0;
-	int c = 0;
-	byte *byte_data = (byte *) d;
-
-	// Check if we can read count * elements with the remaining memory
-	size_t bytes_remaining = EEPROM_24XX512_MAX_ADDR - this->read_addr;
-	size_t element_count = min(count, bytes_remaining / sizeof(T));
-
-	Wire.requestFrom(this->i2c_addr, sizeof(T) * element_count, false);
-
-	// While there is enough bytes left to construct one element
-	for( a = 0; a < element_count; a++ )
-	{
-		// Iterate over each byte in the element shift it into position and xor it to the zeroed out memory
-		for( size_t b = 0; b < sizeof(T); b++ )
-		{
-			if( Wire.available())
-			{
-				byte_data[c] = Wire.read();
-				c++;
-
-				// Increment read address counter
-				this->read_addr++;
-			}
-			else
-			{
-				// Not enough bytes available to read a full element?
-				return a;
-			}
-		}
-	}
-
-	// Return number of elements read
-	return a;
+	unsigned int bytes_available = EEPROM_24XX512_MAX_ADDR - this->read_addr;
+	unsigned int element_count = bytes_available / sizeof(T);
+	element_count = min(count, element_count);
+	unsigned int bytes_read = this->readBytes((byte*) d, element_count * sizeof(T));
+	return bytes_read / sizeof(T);
 }
 
 template<typename T>
-int EEPROM_24XX512::writeArray(int address, const T *d, size_t count)
+unsigned int EEPROM_24XX512::writeArray(unsigned int address, const T* d, unsigned int count)
 {
 	if( this->state != STATE_RANDOM )
 	{
@@ -281,56 +300,28 @@ int EEPROM_24XX512::writeArray(int address, const T *d, size_t count)
 	}
 
 	this->beginWrite(address);
-	int result = this->writeArray(d, count);
+	unsigned int result = this->writeArray(d, count);
 	this->endWrite();
 	return result;
 }
 
 template<typename T>
-int EEPROM_24XX512::writeArray(const T *d, size_t count)
+unsigned int EEPROM_24XX512::writeArray(const T* d, unsigned int count)
 {
 	if( this->state != STATE_WRITE )
 	{
 		return 0;
 	}
 
-	// Make sure there is enough memory to read count * elements
-	int bytes_available = EEPROM_24XX512_MAX_ADDR - this->write_addr;
-	int element_count = min(count, bytes_available / sizeof(T));
-
-	int c = 0;
-	const byte *byte_data = (const byte *) d;
-
-	// Increment through number of data to write
-	for( int a = 0; a < element_count; a++ )
-	{
-		// Increment through number of bytes in element
-		for( size_t b = 0; b < sizeof(T); b++ )
-		{
-			// Write a byte of the data and increment counter
-			Wire.write(byte_data[c]);
-			c++;
-			this->write_count++;
-
-			// If we have filled the write buffer (128 bytes), we have to send stop bit to flush then start again
-			if( this->write_count == EEPROM_24XX512_WRITE_BUFFER_SIZE)
-			{
-				this->endWrite();
-				this->beginWrite(this->write_addr + this->write_count);
-
-				// this->beginWrite() resets write_count and updates this->write_addr
-			}
-		}
-	}
-
-	// Update our write address counter
-	this->write_addr += this->write_count;
-
-	return element_count;
+	unsigned int bytes_available = EEPROM_24XX512_MAX_ADDR - this->write_addr;
+	unsigned int element_count = bytes_available / sizeof(T);
+	element_count = min(count, element_count);
+	unsigned int bytes_read = this->writeBytes((byte*) d, element_count * sizeof(T));
+	return bytes_read / sizeof(T);
 }
 
 template<typename T>
-bool EEPROM_24XX512::read(int address, T *data)
+bool EEPROM_24XX512::read(unsigned int address, T* data)
 {
 	if( this->state != STATE_RANDOM )
 	{
@@ -344,13 +335,13 @@ bool EEPROM_24XX512::read(int address, T *data)
 }
 
 template<typename T>
-bool EEPROM_24XX512::read(T *data)
+bool EEPROM_24XX512::read(T* data)
 {
 	return this->readArray(data, 1) == 1;
 }
 
 template<typename T>
-bool EEPROM_24XX512::write(int address, const T data)
+bool EEPROM_24XX512::write(unsigned int address, const T data)
 {
 	if( this->state != STATE_RANDOM )
 	{
