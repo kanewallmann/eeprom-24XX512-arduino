@@ -1,7 +1,7 @@
 EEPROM (24XX512)
 ================
 
-An Arduino to read/write data to/from Microchip 24XX512 EEPROMs via their i2c interface.
+An Arduino library to read/write data to/from Microchip 24XX512 EEPROMs via their i2c interface.
 
 Yes, it is easy to use the Wire library directly. Or the EEPROM_I2C library. But this library adds some helper
 functions and templates to make it even easier to do more complicated things such as reading and writing an array
