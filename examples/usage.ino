@@ -1,3 +1,7 @@
+/* Part of EEPROM (24XX512) Arduino library
+ * Copyright (C) 2017 Kane Wallmann
+ * See LICENCE.txt for license (MIT)*/
+
 #include <Wire.h>
 #include <EEPROM_24XX512.h>
 
