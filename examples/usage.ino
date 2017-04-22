@@ -16,6 +16,10 @@ void setup()
 	// Random write command
 	eeprom.write( 0, (long)0x1234567 );
 
+	// Need to wait some time before reading after a write
+	while( !eeprom.isReady() )
+		delay(2);
+
 	// Random read command
 	long rd;
 	eeprom.read(0,&rd);
@@ -26,6 +30,10 @@ void setup()
 	eeprom.write( (int)20 );
 	eeprom.write( (int)30 );
 	eeprom.endWrite();
+
+	// Need to wait some time before reading after a write
+	while( !eeprom.isReady() )
+		delay(2);
 
 	// Sequential read
 	int a, b, c;
@@ -38,6 +46,10 @@ void setup()
 	// Array write
 	int data[5] = { 10, 20, 30, 40, 50 };
 	eeprom.writeArray( 0, data, 5 );
+
+	// Need to wait some time before reading after a write
+	while( !eeprom.isReady() )
+		delay(2);
 
 	// Array read
 	eeprom.readArray( 0, data, 5 );
