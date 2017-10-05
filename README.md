@@ -1,6 +1,8 @@
 EEPROM (24XX512)
 ================
 
+![travis](https://travis-ci.org/kanewallmann/eeprom-24XX512-arduino.svg?branch=master)
+
 An Arduino library to read/write data to/from Microchip 24XX512 EEPROMs via their i2c interface.
 
 Yes, it is easy to use the Wire library directly. Or the EEPROM_I2C library. But this library adds some helper
